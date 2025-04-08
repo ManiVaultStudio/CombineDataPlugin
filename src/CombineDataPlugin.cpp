@@ -48,9 +48,8 @@ void CombineDataPlugin::transform()
     if (!std::all_of(
         inputDatasets.begin(),
         inputDatasets.end(),
-        [numDimensions](const auto& dataset) {
-            const auto currentPoints = dataset.get<Points>();
-            return currentPoints->getNumDimensions() == numDimensions;
+        [numDimensions](const mv::Dataset<mv::DatasetImpl>& dataset) {
+            return dataset.get<Points>()->getNumDimensions() == numDimensions;
         })) {
 
         qDebug() << "CombineDataPlugin: all data sets need to have the same number of dimensions...";
