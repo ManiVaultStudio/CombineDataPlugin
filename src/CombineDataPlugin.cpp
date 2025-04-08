@@ -62,7 +62,7 @@ void CombineDataPlugin::transform()
     const QString combinedDataName = "Combined data";      // TODO: create dialog to as for name
 
     mv::Dataset<Points> combinedDataset = mv::data().createDataset<Points>("Points", combinedDataName);
-    mv::Dataset<mv::DatasetImpl> combinedDatasetImpl = mv::Dataset<mv::DatasetImpl>(combinedDataset.getDataset());
+    mv::Dataset<mv::DatasetImpl> combinedDatasetImpl = mv::Dataset<mv::DatasetImpl>(combinedDataset);
 
     std::vector<uint32_t> indicesOffsets;
     indicesOffsets.reserve(inputDatasets.size());
@@ -103,23 +103,24 @@ void CombineDataPlugin::transform()
             combinedDataset->addLinkedData(currentInputDataset, std::move(selectionMapCombinedToInput));
         }
 
+        // Connect deleted datasets and remove selection maps
+        connect(&currentInputDataset, &mv::Dataset<mv::DatasetImpl>::aboutToBeRemoved, this, [this, &combinedDataset, currentInputDataset]() {
+            combinedDataset->removeLinkedDataset(currentInputDataset);
+            });
+
         // Add reverse selection map
         //{
         //    mv::SelectionMap selectionMapInputToCombined;
         //    auto& mapInputToCombined = selectionMapInputToCombined.getMap();
 
         //    for (uint32_t pointID = 0; pointID < numPointsCurrentInput; pointID++) {
-        //        mapInputToCombined[pointID] = {  pointID + currentOffset };
+        //        mapInputToCombined[pointID] = { pointID + currentOffset };
         //    }
 
         //    currentInputPointsData->addLinkedData(combinedDatasetImpl, std::move(selectionMapInputToCombined));
         //    mv::events().notifyDatasetDataChanged(currentInputPointsData);
         //}
 
-        // Connect deleted datasets and remove selection maps
-        connect(&currentInputDataset, &mv::Dataset<mv::DatasetImpl>::aboutToBeRemoved, this, [this, &combinedDataset, currentInputDataset]() {
-            combinedDataset->removeLinkedDataset(currentInputDataset);
-            });
     }
 
     // Add properties: offsets of starting indices
