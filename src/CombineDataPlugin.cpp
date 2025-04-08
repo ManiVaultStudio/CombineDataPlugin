@@ -76,7 +76,7 @@ void CombineDataPlugin::transform()
 
     for (size_t datasetID = 0; datasetID < inputDatasets.size(); datasetID++) {
         mv::Dataset<mv::DatasetImpl>& currentInputDataset = inputDatasets[datasetID];
-        const mv::Dataset<Points> currentInputPointsData = currentInputDataset.get<Points>();
+        mv::Dataset<Points> currentInputPointsData = currentInputDataset.get<Points>();
         combinedDatasetIDs.push_back(currentInputDataset->getId());
         const uint32_t numPointsCurrentInput = currentInputPointsData->getNumPoints();
         const uint32_t currentOffset = indicesOffsets.back();
@@ -105,17 +105,17 @@ void CombineDataPlugin::transform()
         }
 
         // Add reverse selection map
-        {
-            mv::SelectionMap selectionMapInputToCombined;
-            auto& mapInputToCombined = selectionMapInputToCombined.getMap();
+        //{
+        //    mv::SelectionMap selectionMapInputToCombined;
+        //    auto& mapInputToCombined = selectionMapInputToCombined.getMap();
 
-            for (uint32_t pointID = 0; pointID < numPointsCurrentInput; pointID++) {
-                mapInputToCombined[pointID] = {  pointID + currentOffset };
-            }
+        //    for (uint32_t pointID = 0; pointID < numPointsCurrentInput; pointID++) {
+        //        mapInputToCombined[pointID] = {  pointID + currentOffset };
+        //    }
 
-            currentInputDataset->addLinkedData(combinedDatasetImpl, std::move(selectionMapInputToCombined));
-        }
-
+        //    currentInputPointsData->addLinkedData(combinedDatasetImpl, std::move(selectionMapInputToCombined));
+        //    mv::events().notifyDatasetDataChanged(currentInputPointsData);
+        //}
 
         // Connect deleted datasets and remove selection maps
         connect(&currentInputDataset, &mv::Dataset<mv::DatasetImpl>::aboutToBeRemoved, this, [this, &combinedDataset, currentInputDataset]() {
