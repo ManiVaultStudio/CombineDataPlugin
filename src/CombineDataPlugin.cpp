@@ -49,7 +49,8 @@ void CombineDataPlugin::transform()
         inputDatasets.begin(),
         inputDatasets.end(),
         [numDimensions](const auto& dataset) {
-            return dataset.get<Points>()->getNumDimensions() == numDimensions;
+            const auto currentPoints = dataset.get<Points>();
+            return currentPoints->getNumDimensions() == numDimensions;
         })) {
 
         qDebug() << "CombineDataPlugin: all data sets need to have the same number of dimensions...";
